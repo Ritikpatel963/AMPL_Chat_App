@@ -1,4 +1,4 @@
-package com.agromarket.ampl_chat;
+package com.agromarket.ampl_chat.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.agromarket.ampl_chat.R;
 import com.agromarket.ampl_chat.models.ProductItem;
 
 import java.util.ArrayList;

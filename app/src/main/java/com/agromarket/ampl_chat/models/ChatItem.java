@@ -1,4 +1,4 @@
-package com.agromarket.ampl_chat;
+package com.agromarket.ampl_chat.models;
 
 public class ChatItem {
     private String name;

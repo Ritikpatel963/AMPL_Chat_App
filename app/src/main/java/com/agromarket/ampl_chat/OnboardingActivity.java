@@ -6,6 +6,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.agromarket.ampl_chat.adapters.OnboardingAdapter;
+
 public class OnboardingActivity extends AppCompatActivity {
 
     private ViewPager2 viewPager;

@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.agromarket.ampl_chat.adapters.ChatMessageAdapter;
+import com.agromarket.ampl_chat.adapters.ProductAdapter;
 import com.agromarket.ampl_chat.models.MessageItem;
 import com.agromarket.ampl_chat.models.ProductItem;
 import com.google.android.material.bottomsheet.BottomSheetDialog;

@@ -1,4 +1,4 @@
-package com.agromarket.ampl_chat;
+package com.agromarket.ampl_chat.adapters;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

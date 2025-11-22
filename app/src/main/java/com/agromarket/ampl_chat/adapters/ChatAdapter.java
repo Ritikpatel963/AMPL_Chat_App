@@ -1,4 +1,4 @@
-package com.agromarket.ampl_chat;
+package com.agromarket.ampl_chat.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.agromarket.ampl_chat.models.ChatItem;
+import com.agromarket.ampl_chat.ChatScreenActivity;
+import com.agromarket.ampl_chat.R;
 
 import java.util.List;
 

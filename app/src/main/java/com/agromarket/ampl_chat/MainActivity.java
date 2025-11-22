@@ -2,13 +2,15 @@ package com.agromarket.ampl_chat;
 
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.agromarket.ampl_chat.adapters.ChatAdapter;
+import com.agromarket.ampl_chat.models.ChatItem;
 
 import java.util.ArrayList;
 
