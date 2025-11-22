@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Rounded gray background -->
+    <path
+        android:fillColor="#DDDDDD"
+        android:pathData="M4,3h16a1,1 0 0 1 1,1v16a1,1 0 0 1 -1,1H4a1,1 0 0 1 -1,-1V4a1,1 0 0 1 1,-1z"/>
+
+    <!-- Box icon -->
+    <path
+        android:fillColor="#888888"
+        android:pathData="M19 19H5V5h14v14zM8 8v8h8V8H8z"/>
+</vector>
