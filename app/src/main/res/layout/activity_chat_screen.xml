@@ -51,29 +51,36 @@
         android:layout_below="@+id/relativeLayout"
         android:padding="10dp" />
 
-    <!-- Message input -->
     <LinearLayout
         android:id="@+id/messageLayout"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="80dp"
         android:layout_alignParentBottom="true"
-        android:padding="8dp"
-        android:background="#fff">
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:background="#FFFFFF">
 
+        <!-- Rounded EditText box -->
         <EditText
             android:id="@+id/messageBox"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="52dp"
             android:layout_weight="1"
-            android:hint="Type a message" />
+            android:background="@drawable/message_box_bg"
+            android:hint="Type a Message"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:textSize="16sp"
+            android:backgroundTint="@android:color/transparent"
+            android:layout_marginEnd="12dp" />
 
+        <!-- Send button icon -->
         <ImageView
             android:id="@+id/sendBtn"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_send"
+            android:src="@drawable/send_outline"
             android:padding="6dp"
             app:tint="#1b6b2f" />
     </LinearLayout>
-
 </RelativeLayout>
