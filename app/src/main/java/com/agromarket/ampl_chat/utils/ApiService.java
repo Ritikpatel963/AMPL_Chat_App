@@ -1,6 +1,8 @@
 package com.agromarket.ampl_chat.utils;
 
+import com.agromarket.ampl_chat.models.api.AgentResponse;
 import com.agromarket.ampl_chat.models.api.CustomerListResponse;
+import com.agromarket.ampl_chat.models.api.LatestMessageResponse;
 import com.agromarket.ampl_chat.models.api.LoginRequest;
 import com.agromarket.ampl_chat.models.api.LoginResponse;
 import com.agromarket.ampl_chat.models.api.MessageListResponse;
@@ -49,4 +51,14 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Body SendProductRequest body
     );
+
+    @GET("message/latest/{user_id}")
+    Call<LatestMessageResponse> getLatestMessage(
+            @Header("Authorization") String token,
+            @Path("user_id") int userId
+    );
+
+    @Headers("Accept: application/json")
+    @GET("customer/agent")
+    Call<AgentResponse> getAssignedAgent(@Header("Authorization") String token);
 }

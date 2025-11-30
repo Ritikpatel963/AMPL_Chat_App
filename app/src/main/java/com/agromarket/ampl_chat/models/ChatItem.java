@@ -3,9 +3,8 @@ package com.agromarket.ampl_chat.models;
 public class ChatItem {
     private int customerId;
     private String email;
-
     private String name;
-    private String message;
+    private String lastMessage;
     private String time;
     private int unreadCount;
 
@@ -13,9 +12,7 @@ public class ChatItem {
         this.customerId = customerId;
         this.name = name;
         this.email = email;
-
-        // Default values for now (until you implement real messages)
-        this.message = "Tap to chat";
+        this.lastMessage = "Tap to chat";  // default
         this.time = "";
         this.unreadCount = 0;
     }
@@ -24,7 +21,11 @@ public class ChatItem {
     public String getEmail() { return email; }
 
     public String getName() { return name; }
-    public String getMessage() { return message; }
+    public String getLastMessage() { return lastMessage; }
     public String getTime() { return time; }
     public int getUnreadCount() { return unreadCount; }
+
+    public void setLastMessage(String msg) { this.lastMessage = msg; }
+    public void setTime(String time) { this.time = time; }
+    public void setUnreadCount(int count) { this.unreadCount = count; }
 }

@@ -1,5 +1,6 @@
 package com.agromarket.ampl_chat;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -42,7 +43,7 @@ import retrofit2.Response;
 
 public class ChatScreenActivity extends AppCompatActivity {
 
-    private static final String BASE_URL = "http://10.0.2.2:8000/"; // your base
+    private static final String BASE_URL = "https://amplchat.agromarket.co.in/"; // your base
 
     RecyclerView chatRecycler;
     ChatMessageAdapter chatAdapter;
@@ -51,7 +52,7 @@ public class ChatScreenActivity extends AppCompatActivity {
     EditText messageBox;
     ImageView sendBtn, cartBtn, backBtn;
     String chatName;
-
+    int receiverId;
     ArrayList<ProductItem> productList = new ArrayList<>();
 
     SessionManager session;
@@ -70,13 +71,23 @@ public class ChatScreenActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
 
+        int customerId  = getIntent().getIntExtra("customer_id", 0);
+        int agentId     = getIntent().getIntExtra("agent_id", 0);
+
+        boolean isCustomer = session.getUserRole() != null && session.getUserRole().equals("customer");
+
+        // If CUSTOMER → Chat with AGENT
+        // If AGENT → Chat with CUSTOMER
+        receiverId = isCustomer ? agentId : customerId;
+
         chatName = getIntent().getStringExtra("name");
-        chatTitle.setText(chatName == null ? "" : chatName);
+        if (isCustomer) findViewById(R.id.chatName).setVisibility(View.GONE);
+        else chatTitle.setText(chatName);
 
         initViews();
         setupChatList();
-        loadProducts();
         loadMessages();
+        loadProducts();
 
         sendBtn.setOnClickListener(v -> sendTextMessage());
         cartBtn.setOnClickListener(v -> openProductPopup());
@@ -103,7 +114,6 @@ public class ChatScreenActivity extends AppCompatActivity {
         String msg = messageBox.getText().toString().trim();
         if (msg.isEmpty()) return;
 
-        int customerId = getIntent().getIntExtra("customer_id", 0);
         String token = session.getToken();
         if (token == null) {
             Toast.makeText(this, "Not authenticated", Toast.LENGTH_SHORT).show();
@@ -111,7 +121,7 @@ public class ChatScreenActivity extends AppCompatActivity {
         }
 
         ApiService api = ApiClient.getClient().create(ApiService.class);
-        SendMessageRequest body = new SendMessageRequest(customerId, msg);
+        SendMessageRequest body = new SendMessageRequest(receiverId, msg);
 
         api.sendTextMessage("Bearer " + token, body).enqueue(new Callback<SendMessageResponse>() {
             @Override
@@ -158,11 +168,10 @@ public class ChatScreenActivity extends AppCompatActivity {
     }
 
     private void sendProductToChat(ProductItem product) {
-        int customerId = getIntent().getIntExtra("customer_id", 0);
         String token = session.getToken();
 
         ApiService api = ApiClient.getClient().create(ApiService.class);
-        SendProductRequest body = new SendProductRequest(customerId, product.id);
+        SendProductRequest body = new SendProductRequest(receiverId, product.id);
 
         api.sendProductMessage("Bearer " + token, body).enqueue(new Callback<SendMessageResponse>() {
             @Override
@@ -211,32 +220,38 @@ public class ChatScreenActivity extends AppCompatActivity {
     }
 
     private void loadMessages() {
-        int customerId = getIntent().getIntExtra("customer_id", 0);
         String token = session.getToken();
         ApiService api = ApiClient.getClient().create(ApiService.class);
 
-        api.getMessages("Bearer " + token, customerId).enqueue(new Callback<MessageListResponse>() {
+        // FETCH CHAT BETWEEN YOU <-> RECEIVER
+        api.getMessages("Bearer " + token, receiverId).enqueue(new Callback<MessageListResponse>() {
             @Override
             public void onResponse(Call<MessageListResponse> call, Response<MessageListResponse> response) {
-                if (!response.isSuccessful() || response.body() == null) return;
+
+                if (!response.isSuccessful() || response.body() == null) {
+                    Toast.makeText(ChatScreenActivity.this, "Failed to load chat", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 messageList.clear();
-
-                int myId = session.getUserId();
+                int myId = session.getUserId();  // logged user id
 
                 for (ChatMessage m : response.body().messages) {
                     MessageItem item = new MessageItem();
 
-                    item.isSent = (m.sender_id == myId);
+                    item.isSent = (m.sender_id == myId);  // 👈 this sets left/right alignment
 
-                    if ("text".equals(m.type)) {
+                    if (m.type.equals("text")) {
                         item.type = MessageItem.TYPE_TEXT;
                         item.text = m.message;
-                    } else if ("product".equals(m.type)) {
+
+                    } else if (m.type.equals("product")) {
                         item.type = MessageItem.TYPE_IMAGE;
+
                         if (m.data != null && m.data.image != null) {
-                            // m.data.image contains relative path like "uploads/products/..."
-                            item.imageUrl = BASE_URL + (m.data.image.startsWith("/") ? m.data.image.substring(1) : m.data.image);
+                            item.imageUrl = BASE_URL + (m.data.image.startsWith("/")
+                                    ? m.data.image.substring(1)
+                                    : m.data.image);
                         }
                     }
 
@@ -248,7 +263,26 @@ public class ChatScreenActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<MessageListResponse> call, Throwable t) { }
+            public void onFailure(Call<MessageListResponse> call, Throwable t) {
+                Toast.makeText(ChatScreenActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        boolean isCustomer = session.getUserRole() != null && session.getUserRole().equals("customer");
+
+        if (isCustomer) {
+            session.clear(); // remove token + user details (logout)
+            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+
+            Intent i = new Intent(ChatScreenActivity.this, LoginActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+            finish();
+        } else {
+            super.onBackPressed(); // Agent → normal back behavior
+        }
     }
 }

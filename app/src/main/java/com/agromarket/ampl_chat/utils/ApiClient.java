@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "http://10.0.2.2:8000/api/";
+    private static final String BASE_URL = "https://amplchat.agromarket.co.in/api/";
     private static Retrofit retrofit;
 
     public static Retrofit getClient() {

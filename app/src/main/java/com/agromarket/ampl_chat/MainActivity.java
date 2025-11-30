@@ -21,6 +21,7 @@ import com.agromarket.ampl_chat.adapters.ChatAdapter;
 import com.agromarket.ampl_chat.models.ChatItem;
 import com.agromarket.ampl_chat.models.Customer;
 import com.agromarket.ampl_chat.models.api.CustomerListResponse;
+import com.agromarket.ampl_chat.models.api.LatestMessageResponse;
 import com.agromarket.ampl_chat.utils.ApiClient;
 import com.agromarket.ampl_chat.utils.ApiService;
 import com.agromarket.ampl_chat.utils.SessionManager;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     EditText searchEdit;
     TextView txtEmpty, txtNotFound;
     ImageView btnLogout;
+    SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             } else {
+                txtEmpty.setVisibility(View.GONE);  // PREVENT BOTH FROM SHOWING TOGETHER
+
                 if (count == 0) {
                     recyclerView.setVisibility(View.GONE);
                     txtNotFound.setVisibility(View.VISIBLE);
@@ -106,39 +110,52 @@ public class MainActivity extends AppCompatActivity {
 
         ApiService api = ApiClient.getClient().create(ApiService.class);
 
-        api.getAssignedCustomers("Bearer " + token)
-                .enqueue(new Callback<CustomerListResponse>() {
+        api.getAssignedCustomers("Bearer " + token).enqueue(new Callback<CustomerListResponse>() {
+            @Override
+            public void onResponse(Call<CustomerListResponse> call, Response<CustomerListResponse> response) {
+                if (!response.isSuccessful() || response.body() == null) return;
+
+                ArrayList<ChatItem> result = new ArrayList<>();
+
+                for (Customer c : response.body().customers) {
+                    ChatItem item = new ChatItem(c.id, c.name, c.email);
+                    result.add(item);
+                    // GET last message for each customer
+                    loadLatestMessage(item);
+                }
+
+                list.clear();
+                list.addAll(result);
+                adapter.updateList(result);
+                toggleEmptyState(list.size());
+            }
+
+            @Override
+            public void onFailure(Call<CustomerListResponse> call, Throwable t) {
+                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadLatestMessage(ChatItem item) {
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+
+        session = new SessionManager(this);
+        api.getLatestMessage("Bearer " + session.getToken(), item.getCustomerId())
+                .enqueue(new Callback<LatestMessageResponse>() {
                     @Override
-                    public void onResponse(Call<CustomerListResponse> call, Response<CustomerListResponse> response) {
+                    public void onResponse(Call<LatestMessageResponse> call, Response<LatestMessageResponse> res) {
+                        if (res.body()!=null && res.body().message!=null) {
 
-                        if (!response.isSuccessful() || response.body() == null) {
-                            Toast.makeText(MainActivity.this, "Failed to load customers", Toast.LENGTH_SHORT).show();
-                            return;
+                            item.setLastMessage(res.body().message.message);
+                            item.setTime(formatTime(res.body().message.created_at)); // 10:15 PM
+                            item.setUnreadCount(0); // later from websocket
+
+                            adapter.notifyDataSetChanged();
                         }
-
-                        ArrayList<ChatItem> result = new ArrayList<>();
-
-                        for (Customer c : response.body().customers) {
-                            result.add(new ChatItem(c.id, c.name, c.email));
-                        }
-
-                        if (result.isEmpty()) {
-                            txtEmpty.setVisibility(View.VISIBLE);
-                            recyclerView.setVisibility(View.GONE);
-                        } else {
-                            txtEmpty.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
-                        }
-
-                        list.clear();
-                        list.addAll(result);
-                        adapter.updateList(result);
                     }
-
                     @Override
-                    public void onFailure(Call<CustomerListResponse> call, Throwable t) {
-                        Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
+                    public void onFailure(Call<LatestMessageResponse> call, Throwable t) {}
                 });
     }
 
@@ -188,5 +205,25 @@ public class MainActivity extends AppCompatActivity {
     private void goToLogin() {
         startActivity(new Intent(MainActivity.this, LoginActivity.class));
         finish(); // prevent return with back button
+    }
+
+    private void toggleEmptyState(int count) {
+        if (count == 0) {
+            recyclerView.setVisibility(View.GONE);
+            txtEmpty.setVisibility(View.VISIBLE);
+            txtNotFound.setVisibility(View.GONE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            txtEmpty.setVisibility(View.GONE);
+            txtNotFound.setVisibility(View.GONE);
+        }
+    }
+
+    private String formatTime(String rawTime) {
+        try {
+            return rawTime.substring(11,16); // HH:mm short format
+        } catch (Exception e) {
+            return "";
+        }
     }
 }

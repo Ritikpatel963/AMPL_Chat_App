@@ -8,6 +8,7 @@ public class SessionManager {
     private static final String PREF_NAME = "AM_Chat_Pref";
     private static final String TOKEN_KEY = "api_token";
     private static final String USER_ID_KEY = "user_id";
+    private static final String USER_ROLE_KEY = "user_role";
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -31,8 +32,16 @@ public class SessionManager {
         editor.apply();
     }
 
+    public void saveUserRole(String userRole) {
+        editor.putString(USER_ROLE_KEY, userRole);
+        editor.apply();
+    }
+
     public int getUserId() {
         return sharedPreferences.getInt(USER_ID_KEY, -1);
+    }
+    public String getUserRole() {
+        return sharedPreferences.getString(USER_ROLE_KEY, "customer");
     }
 
     public void clear() {

@@ -51,7 +51,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         ChatItem item = filteredList.get(position);
 
         holder.txtName.setText(item.getName());
-        holder.txtMessage.setText(item.getMessage());
+        holder.txtMessage.setText(item.getLastMessage());
         holder.txtTime.setText(item.getTime());
 
         if (item.getUnreadCount() > 0) {

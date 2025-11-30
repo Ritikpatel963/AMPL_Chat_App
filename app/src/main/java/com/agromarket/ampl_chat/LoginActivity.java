@@ -76,27 +76,44 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse loginResponse = response.body();
 
-                    // inside onResponse where loginResponse.status == true
                     if (loginResponse.status) {
                         sessionManager.saveToken(loginResponse.token);
+                        int userId = 0;
+                        String role = "";
+                        int agentId = 0;
 
-                        // save user id if present
                         if (loginResponse.user != null) {
                             try {
-                                sessionManager.saveUserId(loginResponse.user.id);
+                                userId = loginResponse.user.id;
+                                role = loginResponse.user.role;
+                                agentId = loginResponse.agent_id;
+                                sessionManager.saveUserId(userId);
+                                sessionManager.saveUserRole(role);
                             } catch (Exception ignored) {}
                         }
 
-                        Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
+                        // -------------------------
+                        // CHECK ROLE HERE
+                        // -------------------------
+                        if (role.equalsIgnoreCase("customer")) {
+                            // 🔥 For customer directly open chat screen
+                            Intent intent = new Intent(LoginActivity.this, ChatScreenActivity.class);
+                            intent.putExtra("customer_id", userId);  // or customer_id field from API
+                            intent.putExtra("agent_id", agentId);    // important for chat
+                            intent.putExtra("name", loginResponse.user.name);
+                            startActivity(intent);
+                            finish();
+                            return;
+                        }
+
+                        // 🔥 If not a customer → normal app dashboard
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
+
                     } else {
                         Toast.makeText(LoginActivity.this, loginResponse.message, Toast.LENGTH_SHORT).show();
                     }
-
-                } else {
-                    Toast.makeText(LoginActivity.this, "Invalid credentials!", Toast.LENGTH_SHORT).show();
                 }
             }
 
