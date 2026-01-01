@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:id="@+id/main">
 
-    <!-- Top green bar -->
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
@@ -33,16 +32,14 @@
             android:textSize="18sp" />
 
         <ImageView
-            android:id="@+id/cartBtn"
+            android:id="@+id/callBtn"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_cart"
-            app:tint="#fff" />
+            android:src="@drawable/ic_call"  app:tint="#fff" />
     </RelativeLayout>
 
-    <!-- Chat messages -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRecycler"
         android:layout_width="match_parent"
@@ -60,7 +57,15 @@
         android:gravity="center_vertical"
         android:background="#FFFFFF">
 
-        <!-- Rounded EditText box -->
+        <ImageView
+            android:id="@+id/cartBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_cart"
+            android:padding="6dp"
+            android:layout_marginEnd="12dp"
+            app:tint="#1b6b2f" />
+
         <EditText
             android:id="@+id/messageBox"
             android:layout_width="0dp"
@@ -71,10 +76,8 @@
             android:paddingStart="18dp"
             android:paddingEnd="18dp"
             android:textSize="16sp"
-            android:backgroundTint="@android:color/transparent"
             android:layout_marginEnd="12dp" />
 
-        <!-- Send button icon -->
         <ImageView
             android:id="@+id/sendBtn"
             android:layout_width="40dp"
