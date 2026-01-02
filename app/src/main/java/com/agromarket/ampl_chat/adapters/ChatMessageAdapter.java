@@ -14,7 +14,10 @@ import com.agromarket.ampl_chat.R;
 import com.agromarket.ampl_chat.models.MessageItem;
 import com.bumptech.glide.Glide;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -77,6 +80,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         if (holder instanceof SentTextHolder) {
             SentTextHolder h = (SentTextHolder) holder;
             h.msg.setText(item.text);
+            h.time.setText(formatTo12Hour(item.time));
             bindStatus(h.statusIcon, item, position);
 
         } else if (holder instanceof SentImageHolder) {
@@ -87,10 +91,12 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     .placeholder(R.drawable.ic_product_placeholder)
                     .into(h.img);
             h.msg.setText(item.text);
+            h.time.setText(formatTo12Hour(item.time));
             bindStatus(h.statusIcon, item, position);
 
         } else if (holder instanceof ReceivedTextHolder) {
             ((ReceivedTextHolder) holder).msg.setText(item.text);
+            ((ReceivedTextHolder) holder).time.setText(formatTo12Hour(item.time));
 
         } else if (holder instanceof ReceivedImageHolder) {
             ReceivedImageHolder h = (ReceivedImageHolder) holder;
@@ -99,6 +105,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     .placeholder(R.drawable.ic_product_placeholder)
                     .into(h.img);
             h.msg.setText(item.text);
+            h.time.setText(formatTo12Hour(item.time));
         }
     }
 
@@ -112,10 +119,12 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     static class SentTextHolder extends RecyclerView.ViewHolder {
         TextView msg;
         ImageView statusIcon;
+        TextView time;
 
         SentTextHolder(@NonNull View itemView) {
             super(itemView);
             msg = itemView.findViewById(R.id.textMessage);
+            time = itemView.findViewById(R.id.timeText);
             statusIcon = itemView.findViewById(R.id.statusIcon);
         }
     }
@@ -123,30 +132,36 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     static class SentImageHolder extends RecyclerView.ViewHolder {
         ImageView img, statusIcon;
         TextView msg;
+        TextView time;
 
         SentImageHolder(@NonNull View itemView) {
             super(itemView);
             img = itemView.findViewById(R.id.imageMessage);
             msg = itemView.findViewById(R.id.textMessage);
+            time = itemView.findViewById(R.id.timeText);
             statusIcon = itemView.findViewById(R.id.statusIcon);
         }
     }
 
     static class ReceivedTextHolder extends RecyclerView.ViewHolder {
         TextView msg;
+        TextView time;
         ReceivedTextHolder(@NonNull View itemView) {
             super(itemView);
             msg = itemView.findViewById(R.id.textMessage);
+            time = itemView.findViewById(R.id.timeText);
         }
     }
 
     static class ReceivedImageHolder extends RecyclerView.ViewHolder {
         ImageView img;
         TextView msg;
+        TextView time;
         ReceivedImageHolder(@NonNull View itemView) {
             super(itemView);
             img = itemView.findViewById(R.id.imageMessage);
             msg = itemView.findViewById(R.id.textMessage);
+            time = itemView.findViewById(R.id.timeText);
         }
     }
     private void bindStatus(ImageView icon, MessageItem item, int position) {
@@ -178,6 +193,26 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                 });
                 break;
+            case MessageItem.STATUS_SEEN:
+                icon.setImageResource(R.drawable.ic_seen);
+                icon.setOnClickListener(null);
+                break;
+        }
+    }
+
+    public static String formatTo12Hour(String serverTime) {
+        try {
+            SimpleDateFormat serverFormat =
+                    new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
+
+            SimpleDateFormat displayFormat =
+                    new SimpleDateFormat("hh:mm a", Locale.getDefault());
+
+            Date date = serverFormat.parse(serverTime);
+            return displayFormat.format(date);
+
+        } catch (Exception e) {
+            return ""; // fallback
         }
     }
 }

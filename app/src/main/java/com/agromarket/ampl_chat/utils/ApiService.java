@@ -61,4 +61,10 @@ public interface ApiService {
     @Headers("Accept: application/json")
     @GET("customer/agent")
     Call<AgentResponse> getAssignedAgent(@Header("Authorization") String token);
+
+    @POST("messages/seen/{user_id}")
+    Call<Void> markSeen(
+            @Header("Authorization") String token,
+            @Path("user_id") int userId
+    );
 }

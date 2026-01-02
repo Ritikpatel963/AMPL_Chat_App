@@ -9,6 +9,6 @@ public class ChatMessage {
     public ChatMessageData data; // null for text
     public UserShort sender;
     public UserShort receiver;
-    public String created_at;
-    public String updated_at;
+    public String created_at_formatted;
+    public String seen_at;
 }

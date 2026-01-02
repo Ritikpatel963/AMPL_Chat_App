@@ -2,6 +2,7 @@ package com.agromarket.ampl_chat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -46,12 +47,13 @@ TODO:
 1. Full Product List Screen
 2. Multiple Products Selection
 
-3. Show time when seen - API Pending
-4. Product Send with Name and Price - Done
-5. Prevent from sending same message multiple times - Done
+3. Show time for every message - Done
+4. Show seen if it is - Done
+5. Product Send with Name and Price - Done
+6. Prevent from sending same message multiple times - Done
 
-6. Agora Voice Calling
-7. Payment Link
+7. Agora Voice Calling
+8. Payment Link
  */
 
 public class ChatScreenActivity extends AppCompatActivity {
@@ -108,6 +110,7 @@ public class ChatScreenActivity extends AppCompatActivity {
         setupChatList();
         loadMessages();
         loadProducts();
+        markMessagesSeen();
 
         sendBtn.setOnClickListener(v -> sendTextMessage());
         cartBtn.setOnClickListener(v -> openProductPopup());
@@ -169,12 +172,15 @@ public class ChatScreenActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<SendMessageResponse> call, Response<SendMessageResponse> response) {
                 item.status = MessageItem.STATUS_SENT;
+                assert response.body() != null;
+                item.time = response.body().message.created_at_formatted;
                 chatAdapter.notifyItemChanged(position);
             }
 
             @Override
             public void onFailure(Call<SendMessageResponse> call, Throwable t) {
                 item.status = MessageItem.STATUS_FAILED;
+                item.time = "";
                 chatAdapter.notifyItemChanged(position);
             }
         });
@@ -288,12 +294,14 @@ public class ChatScreenActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<SendMessageResponse> call, Response<SendMessageResponse> response) {
                 item.status = MessageItem.STATUS_SENT;
+                item.time = response.body().message.created_at_formatted;
                 chatAdapter.notifyItemChanged(position);
             }
 
             @Override
             public void onFailure(Call<SendMessageResponse> call, Throwable t) {
                 item.status = MessageItem.STATUS_FAILED;
+                item.time = "";
                 chatAdapter.notifyItemChanged(position);
             }
         });
@@ -355,9 +363,13 @@ public class ChatScreenActivity extends AppCompatActivity {
 
                             // 👈 left / right alignment
                             item.isSent = (m.sender_id == myId);
+                            item.time = m.created_at_formatted;
 
-                            // 👈 server messages are already sent
-                            item.status = MessageItem.STATUS_SENT;
+                            if (item.isSent) {
+                                item.status = m.seen_at != null
+                                        ? MessageItem.STATUS_SEEN
+                                        : MessageItem.STATUS_SENT;
+                            }
 
                             if ("text".equals(m.type)) {
 
@@ -395,6 +407,20 @@ public class ChatScreenActivity extends AppCompatActivity {
                                 "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void markMessagesSeen() {
+        String token = session.getToken();
+        if (token == null) return;
+
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+        api.markSeen("Bearer " + token, receiverId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) { }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) { }
+        });
     }
 
     @Override
