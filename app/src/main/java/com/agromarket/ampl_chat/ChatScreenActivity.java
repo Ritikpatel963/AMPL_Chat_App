@@ -204,7 +204,7 @@ public class ChatScreenActivity extends AppCompatActivity {
 
         MessageItem item = new MessageItem();
         item.type = MessageItem.TYPE_IMAGE;
-        item.text = product.name;
+        item.text = product.name + "\n" + product.price;
         item.imageUrl = product.imageUrl;
         item.productId = product.id;
         item.isSent = true;
@@ -363,7 +363,7 @@ public class ChatScreenActivity extends AppCompatActivity {
                             else if ("product".equals(m.type) && m.data != null) {
 
                                 item.type = MessageItem.TYPE_IMAGE;
-                                item.text = m.data.name;
+                                item.text = m.data.name + "\n" + m.data.price;
                                 item.productId = m.data.id;
 
                                 if (m.data.image != null && !m.data.image.isEmpty()) {

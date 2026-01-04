@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,6 +52,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductH
             holder.image.setImageResource(R.drawable.ic_product_placeholder);
         }
 
+        holder.name.setText(item.name);
+        holder.price.setText(item.price);
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onClick(item);
         });
@@ -63,10 +67,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductH
 
     static class ProductHolder extends RecyclerView.ViewHolder {
         ImageView image;
+        TextView name, price;
 
         public ProductHolder(@NonNull View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.productImage);
+            name = itemView.findViewById(R.id.productName);
+            price = itemView.findViewById(R.id.productPrice);
         }
     }
 }
