@@ -480,19 +480,19 @@ public class ChatScreenActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        boolean isCustomer = session.getUserRole() != null && session.getUserRole().equals("customer");
-
-        if (isCustomer) {
-            session.clear(); // remove token + user details (logout)
-            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
-
-            Intent i = new Intent(ChatScreenActivity.this, LoginActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
-            finish();
-        } else {
-            super.onBackPressed(); // Agent → normal back behavior
-        }
+//        boolean isCustomer = session.getUserRole() != null && session.getUserRole().equals("customer");
+//
+//        if (isCustomer) {
+//            session.clear(); // remove token + user details (logout)
+//            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+//
+//            Intent i = new Intent(ChatScreenActivity.this, LoginActivity.class);
+//            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(i);
+//            finish();
+//        } else {
+//            super.onBackPressed(); // Agent → normal back behavior
+//        }
     }
 
 //    Products loading Helpers
