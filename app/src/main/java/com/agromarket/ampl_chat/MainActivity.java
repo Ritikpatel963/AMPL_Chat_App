@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<ChatItem> list;
     private EditText searchEdit;
     private TextView txtEmpty, txtNotFound;
-    private ImageView btnLogout;
 
     private SwipeRefreshLayout swipeRefresh;
 
@@ -77,16 +76,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        btnLogout = findViewById(R.id.btnLogout);
+        ImageView btnLogout = findViewById(R.id.btnLogout);
         recyclerView = findViewById(R.id.recyclerChats);
         searchEdit = findViewById(R.id.searchEdit);
         txtEmpty = findViewById(R.id.txtEmpty);
         txtNotFound = findViewById(R.id.txtNotFound);
 
         swipeRefresh = findViewById(R.id.swipeRefresh);
-        swipeRefresh.setOnRefreshListener(() -> {
-            loadCustomers();
-        });
+        swipeRefresh.setOnRefreshListener(this::loadCustomers);
 
         btnLogout.setOnClickListener(v -> performLogout());
     }
