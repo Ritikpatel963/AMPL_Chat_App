@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,9 +18,12 @@ import java.util.ArrayList;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductHolder> {
 
-    Context context;
-    ArrayList<ProductItem> list;
-    OnProductClick listener;
+    private Context context;
+    private ArrayList<ProductItem> list;
+    private OnProductClick listener;
+
+    private static final int TYPE_SKELETON = 0;
+    private static final int TYPE_PRODUCT = 1;
 
     public interface OnProductClick {
         void onClick(ProductItem item);
@@ -32,28 +36,46 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductH
 
     @NonNull
     @Override
-    public ProductHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ProductHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
-        View v = LayoutInflater.from(context).inflate(R.layout.product_item, parent, false);
+        View v;
+
+        if (viewType == TYPE_SKELETON) {
+            v = LayoutInflater.from(context)
+                    .inflate(R.layout.product_item_skeleton, parent, false);
+        } else {
+            v = LayoutInflater.from(context)
+                    .inflate(R.layout.product_item, parent, false);
+        }
         return new ProductHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProductHolder holder, int position) {
+    public void onBindViewHolder(ProductHolder holder, int position) {
         ProductItem item = list.get(position);
 
-        if (item.imageUrl != null && !item.imageUrl.isEmpty()) {
-            Glide.with(context)
-                    .load(item.imageUrl)
-                    .placeholder(R.drawable.ic_product_placeholder)
-                    .into(holder.image);
-        } else {
-            holder.image.setImageResource(R.drawable.ic_product_placeholder);
-        }
+        if (item.isSkeleton) return;
 
+        Glide.with(context)
+                .load(item.imageUrl)
+                .placeholder(R.drawable.ic_product_placeholder)
+                .into(holder.image);
+
+        holder.name.setText(item.name);
+        holder.price.setText(item.price);
+
+        holder.checkIcon.setVisibility(
+                item.isSelected ? View.VISIBLE : View.GONE
+        );
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onClick(item);
+            item.isSelected = !item.isSelected;
+            notifyItemChanged(position);
         });
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return list.get(position).isSkeleton ? TYPE_SKELETON : TYPE_PRODUCT;
     }
 
     @Override
@@ -62,11 +84,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductH
     }
 
     static class ProductHolder extends RecyclerView.ViewHolder {
-        ImageView image;
+        ImageView image, checkIcon;
+        TextView name, price;
 
-        public ProductHolder(@NonNull View itemView) {
+        public ProductHolder(View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.productImage);
+            name = itemView.findViewById(R.id.productName);
+            price = itemView.findViewById(R.id.productPrice);
+            checkIcon = itemView.findViewById(R.id.checkIcon);
         }
     }
 }

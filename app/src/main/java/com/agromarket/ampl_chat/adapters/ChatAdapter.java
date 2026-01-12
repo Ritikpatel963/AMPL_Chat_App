@@ -2,6 +2,7 @@ package com.agromarket.ampl_chat.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +20,9 @@ import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
-    private List<ChatItem> list;
-    private List<ChatItem> filteredList;
-    private Context context;
+    private final List<ChatItem> originalList = new ArrayList<>();
+    private final List<ChatItem> displayList = new ArrayList<>();
+    private final Context context;
 
     public interface OnSearchResultListener {
         void onSearchResult(int count);
@@ -33,32 +34,37 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         this.searchListener = listener;
     }
 
-    public ChatAdapter(Context context, List<ChatItem> list) {
+    public ChatAdapter(Context context) {
         this.context = context;
-        this.list = list;
-        this.filteredList = new ArrayList<>(list);
     }
 
     @NonNull
     @Override
-    public ChatAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.row_chat_item, parent, false);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(context)
+                .inflate(R.layout.row_chat_item, parent, false);
         return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) {
-        ChatItem item = filteredList.get(position);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        ChatItem item = displayList.get(position);
 
         holder.txtName.setText(item.getName());
         holder.txtMessage.setText(item.getLastMessage());
         holder.txtTime.setText(item.getTime());
 
         if (item.getUnreadCount() > 0) {
-            holder.txtUnread.setText(String.valueOf(item.getUnreadCount()));
             holder.txtUnread.setVisibility(View.VISIBLE);
+            holder.txtUnread.setText(String.valueOf(item.getUnreadCount()));
+
+            holder.txtName.setTypeface(null, Typeface.BOLD);
+            holder.txtMessage.setTypeface(null, Typeface.BOLD);
         } else {
             holder.txtUnread.setVisibility(View.GONE);
+
+            holder.txtName.setTypeface(null, Typeface.NORMAL);
+            holder.txtMessage.setTypeface(null, Typeface.NORMAL);
         }
 
         holder.itemView.setOnClickListener(v -> {
@@ -72,13 +78,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return filteredList.size();
+        return displayList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtName, txtMessage, txtTime, txtUnread;
 
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
             txtName = itemView.findViewById(R.id.txtName);
             txtMessage = itemView.findViewById(R.id.txtMessage);
@@ -87,38 +93,40 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
     }
 
-    public void updateList(List<ChatItem> newList) {
-        list.clear();
-        list.addAll(newList);
+    // Replace entire dataset
+    public void submitList(List<ChatItem> newList) {
+        originalList.clear();
+        originalList.addAll(newList);
 
-        filteredList.clear();
-        filteredList.addAll(newList);
+        displayList.clear();
+        displayList.addAll(newList);
 
         notifyDataSetChanged();
-
-        if (searchListener != null) {
-            searchListener.onSearchResult(filteredList.size());
-        }
+        notifySearchResult();
     }
 
-    public void filter(String text) {
-        filteredList.clear();
+    // Filter safely
+    public void filter(String query) {
+        displayList.clear();
 
-        if (text.isEmpty()) {
-            filteredList.addAll(list);
+        if (query.isEmpty()) {
+            displayList.addAll(originalList);
         } else {
-            text = text.toLowerCase();
-            for (ChatItem c : list) {
-                if (c.getName().toLowerCase().contains(text)) {
-                    filteredList.add(c);
+            String lower = query.toLowerCase();
+            for (ChatItem item : originalList) {
+                if (item.getName().toLowerCase().contains(lower)) {
+                    displayList.add(item);
                 }
             }
         }
 
         notifyDataSetChanged();
+        notifySearchResult();
+    }
 
+    private void notifySearchResult() {
         if (searchListener != null) {
-            searchListener.onSearchResult(filteredList.size());
+            searchListener.onSearchResult(displayList.size());
         }
     }
 }

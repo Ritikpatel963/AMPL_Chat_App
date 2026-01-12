@@ -2,7 +2,6 @@ package com.agromarket.ampl_chat.utils;
 
 import com.agromarket.ampl_chat.models.api.AgentResponse;
 import com.agromarket.ampl_chat.models.api.CustomerListResponse;
-import com.agromarket.ampl_chat.models.api.LatestMessageResponse;
 import com.agromarket.ampl_chat.models.api.LoginRequest;
 import com.agromarket.ampl_chat.models.api.LoginResponse;
 import com.agromarket.ampl_chat.models.api.MessageListResponse;
@@ -18,6 +17,7 @@ import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -32,7 +32,10 @@ public interface ApiService {
     Call<CustomerListResponse> getAssignedCustomers(@Header("Authorization") String token);
 
     @GET("products")
-    Call<ProductListResponse> getProducts(@Header("Authorization") String token);
+    Call<ProductListResponse> getProducts(
+            @Header("Authorization") String token,
+            @Query("page") int page
+    );
 
     @GET("messages/{user_id}")
     Call<MessageListResponse> getMessages(
@@ -52,13 +55,13 @@ public interface ApiService {
             @Body SendProductRequest body
     );
 
-    @GET("message/latest/{user_id}")
-    Call<LatestMessageResponse> getLatestMessage(
-            @Header("Authorization") String token,
-            @Path("user_id") int userId
-    );
-
     @Headers("Accept: application/json")
     @GET("customer/agent")
     Call<AgentResponse> getAssignedAgent(@Header("Authorization") String token);
+
+    @POST("messages/seen/{user_id}")
+    Call<Void> markSeen(
+            @Header("Authorization") String token,
+            @Path("user_id") int userId
+    );
 }

@@ -2,7 +2,6 @@ package com.agromarket.ampl_chat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -22,63 +21,87 @@ import retrofit2.Response;
 public class OnboardingActivity extends AppCompatActivity {
 
     private ViewPager2 viewPager;
-    SessionManager sessionManager;
+    private SessionManager sessionManager;
+    private ApiService apiService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);  // MUST BE FIRST
+        super.onCreate(savedInstanceState);
 
         sessionManager = new SessionManager(this);
+        apiService = ApiClient.getClient().create(ApiService.class);
 
-        // USER ALREADY LOGGED IN
-        if (sessionManager.getToken() != null && !sessionManager.getToken().isEmpty()) {
-
-            // CUSTOMER → DIRECT CHAT
-            if (sessionManager.getUserRole() != null &&
-                sessionManager.getUserRole().equalsIgnoreCase("customer")) {
-                getCustomerAssignedAgent(); // 👈 fetch agent api & redirect
-                return;
-            }
-
-            // AGENT → OPEN CUSTOMER LIST
-            startActivity(new Intent(OnboardingActivity.this, MainActivity.class));
-            finish();
+        if (isUserLoggedIn()) {
+            handleLoggedInUser();
             return;
         }
 
-        // FIRST TIME USERS → SWIPE SCREEN
+        setupOnboarding();
+    }
+
+    // =======================
+    // LOGIN STATE HANDLING
+    // =======================
+    private boolean isUserLoggedIn() {
+        return sessionManager.getToken() != null && !sessionManager.getToken().isEmpty();
+    }
+
+    private void handleLoggedInUser() {
+        String role = sessionManager.getUserRole();
+
+        if ("customer".equalsIgnoreCase(role)) {
+            fetchAssignedAgent();
+        } else {
+            openMainActivity();
+        }
+    }
+
+    // =======================
+    // ONBOARDING
+    // =======================
+    private void setupOnboarding() {
         setContentView(R.layout.activity_onboarding);
         viewPager = findViewById(R.id.viewPager);
         viewPager.setAdapter(new OnboardingAdapter(this));
     }
 
-
-    // ===== CUSTOMER FLOW - FETCH AGENT API & REDIRECT =====
-    private void getCustomerAssignedAgent() {
-        ApiService api = ApiClient.getClient().create(ApiService.class);
-
-        api.getAssignedAgent("Bearer " + sessionManager.getToken())
+    // =======================
+    // CUSTOMER FLOW
+    // =======================
+    private void fetchAssignedAgent() {
+        apiService.getAssignedAgent("Bearer " + sessionManager.getToken())
                 .enqueue(new Callback<AgentResponse>() {
-                    @Override
-                    public void onResponse(Call<AgentResponse> call, Response<AgentResponse> res) {
-                        int agentId = (res.body() != null) ? res.body().agent_id : 0;
 
-                        Intent i = new Intent(OnboardingActivity.this, ChatScreenActivity.class);
-                        i.putExtra("customer_id", sessionManager.getUserId());
-                        i.putExtra("agent_id", agentId);
-                        startActivity(i);
-                        finish();
+                    @Override
+                    public void onResponse(Call<AgentResponse> call, Response<AgentResponse> response) {
+                        if (!response.isSuccessful() || response.body() == null) {
+                            navigateToChat(0);
+                            return;
+                        }
+
+                        navigateToChat(response.body().agent_id);
                     }
 
                     @Override
                     public void onFailure(Call<AgentResponse> call, Throwable t) {
-                        // fallback no agent
-                        Intent i = new Intent(OnboardingActivity.this, ChatScreenActivity.class);
-                        i.putExtra("customer_id", sessionManager.getUserId());
-                        i.putExtra("agent_id", 0);
-                        startActivity(i);
-                        finish();
+                        navigateToChat(0);
                     }
                 });
+    }
+
+    // =======================
+    // NAVIGATION
+    // =======================
+    private void navigateToChat(int agentId) {
+        Intent intent = new Intent(this, ChatScreenActivity.class);
+        intent.putExtra("customer_id", sessionManager.getUserId());
+        intent.putExtra("agent_id", agentId);
+        startActivity(intent);
+        finish();
+    }
+
+    private void openMainActivity() {
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 }
