@@ -31,8 +31,10 @@ import com.agromarket.ampl_chat.models.api.SendMessageResponse;
 import com.agromarket.ampl_chat.models.api.SendProductRequest;
 import com.agromarket.ampl_chat.utils.ApiClient;
 import com.agromarket.ampl_chat.utils.ApiService;
+import com.agromarket.ampl_chat.utils.RealtimeManager;
 import com.agromarket.ampl_chat.utils.SessionManager;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -113,8 +115,18 @@ public class ChatScreenActivity extends AppCompatActivity {
         sendBtn.setOnClickListener(v -> sendTextMessage());
         cartBtn.setOnClickListener(v -> openProductPopup());
         backBtn.setOnClickListener(v -> onBackPressed());
-    }
 
+
+        RealtimeManager realtime = new RealtimeManager();
+
+        realtime.connect(
+                this,
+                session.getUserId(),
+                receiverId,
+                session.getToken(),
+                data -> runOnUiThread(() -> handleRealtimeMessage(data))
+        );
+    }
     private void initViews() {
         chatRecycler = findViewById(R.id.chatRecycler);
         messageBox = findViewById(R.id.messageBox);
@@ -220,8 +232,12 @@ public class ChatScreenActivity extends AppCompatActivity {
         api.sendProductMessage("Bearer " + token, body).enqueue(new Callback<SendMessageResponse>() {
             @Override
             public void onResponse(Call<SendMessageResponse> call, Response<SendMessageResponse> response) {
-                item.status = MessageItem.STATUS_SENT;
-                item.time = response.body().message.created_at_formatted;
+                if (response.isSuccessful() && response.body() != null) {
+                    item.status = MessageItem.STATUS_SENT;
+                    item.time = response.body().message.created_at_formatted;
+                } else {
+                    item.status = MessageItem.STATUS_FAILED;
+                }
                 chatAdapter.notifyItemChanged(position);
             }
 
@@ -308,13 +324,19 @@ public class ChatScreenActivity extends AppCompatActivity {
             api.sendTextMessage("Bearer " + token, body).enqueue(new Callback<SendMessageResponse>() {
                 @Override
                 public void onResponse(Call<SendMessageResponse> call, Response<SendMessageResponse> response) {
-                    item.status = MessageItem.STATUS_SENT;
+                    if (response.isSuccessful() && response.body() != null) {
+                        item.status = MessageItem.STATUS_SENT;
+                        item.time = response.body().message.created_at_formatted;
+                    } else {
+                        item.status = MessageItem.STATUS_FAILED;
+                    }
                     chatAdapter.notifyItemChanged(position);
                 }
 
                 @Override
                 public void onFailure(Call<SendMessageResponse> call, Throwable t) {
                     item.status = MessageItem.STATUS_FAILED;
+                    item.time = "";
                     chatAdapter.notifyItemChanged(position);
                 }
             });
@@ -326,13 +348,19 @@ public class ChatScreenActivity extends AppCompatActivity {
             api.sendProductMessage("Bearer " + token, body).enqueue(new Callback<SendMessageResponse>() {
                 @Override
                 public void onResponse(Call<SendMessageResponse> call, Response<SendMessageResponse> response) {
-                    item.status = MessageItem.STATUS_SENT;
+                    if (response.isSuccessful() && response.body() != null) {
+                        item.status = MessageItem.STATUS_SENT;
+                        item.time = response.body().message.created_at_formatted;
+                    } else {
+                        item.status = MessageItem.STATUS_FAILED;
+                    }
                     chatAdapter.notifyItemChanged(position);
                 }
 
                 @Override
                 public void onFailure(Call<SendMessageResponse> call, Throwable t) {
                     item.status = MessageItem.STATUS_FAILED;
+                    item.time = "";
                     chatAdapter.notifyItemChanged(position);
                 }
             });
@@ -480,19 +508,19 @@ public class ChatScreenActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-//        boolean isCustomer = session.getUserRole() != null && session.getUserRole().equals("customer");
-//
-//        if (isCustomer) {
-//            session.clear(); // remove token + user details (logout)
-//            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
-//
-//            Intent i = new Intent(ChatScreenActivity.this, LoginActivity.class);
-//            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(i);
-//            finish();
-//        } else {
-//            super.onBackPressed(); // Agent → normal back behavior
-//        }
+        boolean isCustomer = session.getUserRole() != null && session.getUserRole().equals("customer");
+
+        if (isCustomer) {
+            session.clear(); // remove token + user details (logout)
+            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+
+            Intent i = new Intent(ChatScreenActivity.this, LoginActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+            finish();
+        } else {
+            super.onBackPressed(); // Agent → normal back behavior
+        }
     }
 
 //    Products loading Helpers
@@ -516,4 +544,26 @@ public class ChatScreenActivity extends AppCompatActivity {
         }
     }
 
+    private void handleRealtimeMessage(String json) {
+
+        Gson gson = new Gson();
+        ChatMessage m = gson.fromJson(json, ChatMessage.class);
+
+        MessageItem item = new MessageItem();
+        item.isSent = false;
+        item.time = m.created_at_formatted;
+
+        if ("text".equals(m.type)) {
+            item.type = MessageItem.TYPE_TEXT;
+            item.text = m.message;
+        } else if ("product".equals(m.type)) {
+            item.type = MessageItem.TYPE_IMAGE;
+            item.text = m.data.name + "\n" + m.data.price;
+            item.imageUrl = BASE_URL + m.data.image;
+        }
+
+        messageList.add(item);
+        chatAdapter.notifyItemInserted(messageList.size() - 1);
+        chatRecycler.scrollToPosition(messageList.size() - 1);
+    }
 }
