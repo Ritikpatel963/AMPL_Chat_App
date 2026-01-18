@@ -41,6 +41,8 @@ dependencies {
     implementation libs.swiperefreshlayout
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
     implementation 'com.pusher:pusher-java-client:2.4.4'
+    implementation 'io.agora.rtc:voice-sdk:4.5.0'
+
 
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

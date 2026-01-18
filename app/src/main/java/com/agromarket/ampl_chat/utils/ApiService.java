@@ -1,6 +1,7 @@
 package com.agromarket.ampl_chat.utils;
 
 import com.agromarket.ampl_chat.models.api.AgentResponse;
+import com.agromarket.ampl_chat.models.api.CallResponse;
 import com.agromarket.ampl_chat.models.api.CustomerListResponse;
 import com.agromarket.ampl_chat.models.api.LoginRequest;
 import com.agromarket.ampl_chat.models.api.LoginResponse;
@@ -10,6 +11,8 @@ import com.agromarket.ampl_chat.models.api.SendMessageRequest;
 import com.agromarket.ampl_chat.models.api.SendMessageResponse;
 import com.agromarket.ampl_chat.models.api.SendProductRequest;
 import com.agromarket.ampl_chat.models.api.VendorRegisterResponse;
+
+import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -98,5 +101,29 @@ public interface ApiService {
     Call<Void> markSeen(
             @Header("Authorization") String token,
             @Path("user_id") int userId
+    );
+
+    @POST("calls/start")
+    Call<CallResponse> startCall(
+            @Header("Authorization") String token,
+            @Body Map<String, Integer> body
+    );
+
+    @POST("calls/{id}/accept")
+    Call<CallResponse> acceptCall(
+            @Header("Authorization") String token,
+            @Path("id") int callId
+    );
+
+    @POST("calls/{id}/reject")
+    Call<Void> rejectCall(
+            @Header("Authorization") String token,
+            @Path("id") int callId
+    );
+
+    @POST("calls/{id}/end")
+    Call<Void> endCall(
+            @Header("Authorization") String token,
+            @Path("id") int callId
     );
 }

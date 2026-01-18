@@ -6,7 +6,7 @@
 
     <!-- First tick -->
     <path
-        android:fillColor="#2196F3"
+        android:fillColor="#D0E5D8"
         android:pathData="
             M7,16.17
             L2.83,12
@@ -18,7 +18,7 @@
 
     <!-- Second tick (shifted right) -->
     <path
-        android:fillColor="#2196F3"
+        android:fillColor="#D0E5D8"
         android:pathData="
             M11,16.17
             L6.83,12

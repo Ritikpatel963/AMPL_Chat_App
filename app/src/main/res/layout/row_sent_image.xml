@@ -1,54 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:padding="8dp"
-    android:gravity="end"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="6dp">
 
-    <ImageView
-        android:id="@+id/imageMessage"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
-        android:layout_marginEnd="15dp"
-        android:background="@drawable/bg_sent_bubble"
-        android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <TextView
-        android:id="@+id/textMessage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:background="@drawable/bg_sent_bubble"
-        android:padding="12dp"
-        android:textColor="#ffffff"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="@+id/imageMessage"
-        app:layout_constraintStart_toStartOf="@+id/imageMessage"
-        app:layout_constraintTop_toBottomOf="@+id/imageMessage" />
-
-    <TextView
-        android:id="@+id/timeText"
+    <!-- Bubble container -->
+    <LinearLayout
+        android:id="@+id/bubbleContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="12:45 PM"
-        android:textColor="#888"
-        android:textSize="10sp"
-        app:layout_constraintEnd_toEndOf="@+id/textMessage"
-        app:layout_constraintTop_toBottomOf="@+id/textMessage" />
-
-    <ImageView
-        android:id="@+id/statusIcon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:src="@drawable/ic_clock"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/textMessage"
+        android:orientation="vertical"
+        android:background="@drawable/bg_sent_bubble_card"
+        android:elevation="3dp"
+        android:padding="6dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textMessage" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Image -->
+        <ImageView
+            android:id="@+id/imageMessage"
+            android:layout_width="180dp"
+            android:layout_height="140dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/bg_sent_image"
+            android:clipToOutline="true"/>
+
+        <!-- Text -->
+        <TextView
+            android:id="@+id/textMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:padding="8dp"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:maxLines="3"
+            android:ellipsize="end"/>
+
+        <!-- Footer row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end|center_vertical"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/timeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12:45 PM"
+                android:textColor="#D0E5D8"
+                android:textSize="10sp"/>
+
+            <ImageView
+                android:id="@+id/statusIcon"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_clock" />
+        </LinearLayout>
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

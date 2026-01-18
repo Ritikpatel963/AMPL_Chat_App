@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F172A"
+    android:padding="24dp">
+
+    <!-- Caller Name -->
+    <TextView
+        android:id="@+id/tvCallerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="John Doe"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp" />
+
+    <!-- Incoming Call Text -->
+    <TextView
+        android:id="@+id/tvIncoming"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Incoming call"
+        android:textColor="#CBD5E1"
+        android:textSize="16sp"
+        android:layout_below="@id/tvCallerName"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp" />
+
+    <!-- Bottom Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="40dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <!-- Reject -->
+        <ImageView
+            android:id="@+id/btnReject"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:padding="18dp"
+            android:src="@drawable/ic_call_end"
+            android:rotation="138"
+            android:background="@drawable/bg_circle_red"
+            app:tint="#FFFFFF" />
+
+        <!-- Space -->
+        <View
+            android:layout_width="48dp"
+            android:layout_height="1dp" />
+
+        <!-- Accept -->
+        <ImageView
+            android:id="@+id/btnAccept"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:padding="18dp"
+            android:src="@drawable/ic_call"
+            android:background="@drawable/bg_circle_green"
+            app:tint="#FFFFFF" />
+
+    </LinearLayout>
+
+</RelativeLayout>
