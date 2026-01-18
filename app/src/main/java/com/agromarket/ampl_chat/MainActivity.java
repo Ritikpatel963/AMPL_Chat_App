@@ -38,6 +38,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/*
+TODO:
+1. Realtime Chat Updates
+2. Add Navbar
+3. Add profile option
+ */
+
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;

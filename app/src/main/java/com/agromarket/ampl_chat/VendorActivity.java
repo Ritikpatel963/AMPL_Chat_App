@@ -37,6 +37,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/*
+TODO:
+1. Implement Share Functionality
+2. Show product image
+3. Implement profile system
+ */
+
 public class VendorActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;

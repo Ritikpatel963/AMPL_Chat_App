@@ -31,6 +31,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/*
+TODO:
+1. UI Improvements
+2. Call Recording
+ */
+
 public class VoiceCallActivity extends AppCompatActivity {
 
     private static final String TAG = "VoiceCallActivity";

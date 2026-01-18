@@ -35,6 +35,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/*
+TODO:
+1. Same as Vendor Activity
+2. Edit Product System
+ */
+
 public class VendorProductListActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;

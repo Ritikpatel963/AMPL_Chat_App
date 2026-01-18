@@ -24,6 +24,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/*
+TODO In FUTURE:
+ 1. OTP System
+ */
+
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputEditText emailInput, passwordInput;

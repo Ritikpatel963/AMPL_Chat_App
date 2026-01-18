@@ -48,6 +48,17 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/*
+TODO:
+1. Add Search
+2. Attachments Upload
+3. Realtime Seen Show
+4. Show Chat history Dates
+5. Show Call History
+6. Product Order System
+7. Image and Video View
+ */
+
 public class ChatScreenActivity extends AppCompatActivity
         implements RealtimeSocketManager.SocketListener {
 

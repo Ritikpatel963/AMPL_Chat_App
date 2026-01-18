@@ -24,6 +24,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/*
+TODO:
+1. Automatically Close if User Cuts the Call
+ */
+
 public class IncomingCallActivity extends AppCompatActivity {
 
     private static final int AUTO_END_SECONDS = 30;

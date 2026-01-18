@@ -51,6 +51,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/*
+TODO:
+1. Fetch Categories from API
+2. Improve Image upload UI
+3. Multi Image uploading issues
+4. Add proper validations
+ */
+
 public class VendorAddProductActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
