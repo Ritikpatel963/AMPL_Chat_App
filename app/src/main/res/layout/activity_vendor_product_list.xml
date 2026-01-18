@@ -8,7 +8,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:id="@+id/mainLinearLayout">
 
         <!-- Toolbar -->
         <androidx.appcompat.widget.Toolbar
@@ -45,8 +46,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="All Product"
-                android:textColor="#666666"
+                android:text="All Products"
+                android:textColor="#000"
                 android:textSize="16sp" />
 
             <Button
@@ -78,6 +79,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        app:headerLayout="@layout/vendor_nav_header"
         app:menu="@menu/drawer_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

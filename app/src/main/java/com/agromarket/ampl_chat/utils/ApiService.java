@@ -10,6 +10,10 @@ import com.agromarket.ampl_chat.models.api.ProductListResponse;
 import com.agromarket.ampl_chat.models.api.SendMessageRequest;
 import com.agromarket.ampl_chat.models.api.SendMessageResponse;
 import com.agromarket.ampl_chat.models.api.SendProductRequest;
+import com.agromarket.ampl_chat.models.api.VendorProductCreateResponse;
+import com.agromarket.ampl_chat.models.api.VendorProductListResponse;
+import com.agromarket.ampl_chat.models.api.VendorProductMetricsResponse;
+import com.agromarket.ampl_chat.models.api.VendorProductResponse;
 import com.agromarket.ampl_chat.models.api.VendorRegisterResponse;
 
 import java.util.Map;
@@ -18,6 +22,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
@@ -125,5 +130,77 @@ public interface ApiService {
     Call<Void> endCall(
             @Header("Authorization") String token,
             @Path("id") int callId
+    );
+
+    // ========== VENDOR PRODUCT APIS ==========
+
+    /**
+     * Get vendor product metrics (total, active, near expiry) + recent products
+     */
+    @Headers("Accept: application/json")
+    @POST("vendor/metrics")
+    Call<VendorProductMetricsResponse> getVendorProductMetrics(
+            @Header("Authorization") String token
+    );
+
+    /**
+     * Get all vendor products
+     */
+    @Headers("Accept: application/json")
+    @GET("vendor/products")
+    Call<VendorProductListResponse> getVendorProducts(
+            @Header("Authorization") String token
+    );
+
+    /**
+     * Get single vendor product by ID
+     */
+    @Headers("Accept: application/json")
+    @GET("vendor/products/{id}")
+    Call<VendorProductResponse> getVendorProduct(
+            @Header("Authorization") String token,
+            @Path("id") int productId
+    );
+
+    /**
+     * Create new vendor product (with images)
+     */
+    @Multipart
+    @POST("vendor/products")
+    Call<VendorProductCreateResponse> createVendorProduct(
+            @Header("Authorization") String token,
+            @Part("product_name") RequestBody productName,
+            @Part("category_id") RequestBody categoryId,
+            @Part("brand_name") RequestBody brandName,
+            @Part("unit_type") RequestBody unitType,
+            @Part("unit_size") RequestBody unitSize,
+            @Part("product_rate") RequestBody productRate,
+            @Part("product_expiry") RequestBody productExpiry,
+            @Part("quantity") RequestBody quantity,
+            @Part MultipartBody.Part[] images
+    );
+
+    /**
+     * Update vendor product
+     */
+    @Multipart
+    @POST("vendor/products/{id}")
+    Call<VendorProductResponse> updateVendorProduct(
+            @Header("Authorization") String token,
+            @Path("id") int productId,
+            @Part("_method") RequestBody method, // PUT
+            @Part("product_name") RequestBody productName,
+            @Part("product_rate") RequestBody productRate,
+            @Part("quantity") RequestBody quantity,
+            @Part MultipartBody.Part[] images
+    );
+
+    /**
+     * Delete vendor product
+     */
+    @DELETE("vendor/products/{id}")
+    Call<VendorProductResponse> deleteVendorProduct(
+            @Header("Authorization") String token,
+            @Path("id") int productId
     );
 }

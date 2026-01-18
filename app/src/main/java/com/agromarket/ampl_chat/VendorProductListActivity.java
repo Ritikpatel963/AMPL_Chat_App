@@ -3,10 +3,11 @@ package com.agromarket.ampl_chat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -19,10 +20,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.agromarket.ampl_chat.adapters.VendorProductAdapter;
 import com.agromarket.ampl_chat.models.VendorProduct;
+import com.agromarket.ampl_chat.models.api.VendorProductListResponse;
+import com.agromarket.ampl_chat.models.api.VendorProductMetricsResponse;
+import com.agromarket.ampl_chat.models.api.VendorProductResponse;
+import com.agromarket.ampl_chat.utils.ApiClient;
+import com.agromarket.ampl_chat.utils.ApiService;
+import com.agromarket.ampl_chat.utils.SessionManager;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class VendorProductListActivity extends AppCompatActivity {
 
@@ -30,22 +41,28 @@ public class VendorProductListActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private Toolbar toolbar;
     private RecyclerView productRecycler;
+
     private VendorProductAdapter productAdapter;
-    private List<VendorProduct> productList;
-    private Button btnAddProduct;
+    private List<VendorProduct> productList = new ArrayList<>();
+
+    private SessionManager session;
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vendor_product_list);
 
+        session = new SessionManager(this);
+        apiService = ApiClient.getClient().create(ApiService.class);
+
         initViews();
         setupWindowInsets();
         setupToolbar();
         setupNavigationDrawer();
         setupRecyclerView();
+
         loadProducts();
-        setupClickListeners();
     }
 
     private void initViews() {
@@ -53,14 +70,14 @@ public class VendorProductListActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigationView);
         toolbar = findViewById(R.id.toolbar);
         productRecycler = findViewById(R.id.productRecycler);
-        btnAddProduct = findViewById(R.id.btnAddProduct);
     }
 
     private void setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.drawerLayout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            toolbar.setPadding(0, systemBars.top, 0, 0);
-            return insets;
+            LinearLayout mainLayout = findViewById(R.id.mainLinearLayout);
+            mainLayout.setPadding(0, systemBars.top, 0, 0);
+            return WindowInsetsCompat.CONSUMED;
         });
     }
 
@@ -68,7 +85,7 @@ public class VendorProductListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("");
+            getSupportActionBar().setTitle("My Products");
         }
     }
 
@@ -82,42 +99,71 @@ public class VendorProductListActivity extends AppCompatActivity {
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.nav_dashboard) {
+            if (item.getItemId() == R.id.nav_dashboard) {
                 finish();
-            } else if (id == R.id.nav_products) {
-                Toast.makeText(this, "Already on Products page", Toast.LENGTH_SHORT).show();
-            } else if (id == R.id.nav_logout) {
+            } else if (item.getItemId() == R.id.nav_logout) {
                 logout();
             }
-
             drawerLayout.closeDrawers();
             return true;
         });
     }
 
     private void setupRecyclerView() {
-        productList = new ArrayList<>();
         productAdapter = new VendorProductAdapter(productList, this::showProductMenu);
         productRecycler.setLayoutManager(new LinearLayoutManager(this));
         productRecycler.setAdapter(productAdapter);
     }
 
+    /**
+     * 🔥 API CALL – Load vendor products
+     */
     private void loadProducts() {
-        // Sample data - replace with actual data from database/API
-        productList.add(new VendorProduct("Product Title", "Brand Name", "Product Expiry"));
-        productList.add(new VendorProduct("Product Title", "Brand Name", "Product Expiry"));
-        productList.add(new VendorProduct("Product Title", "Brand Name", "Product Expiry"));
-        productList.add(new VendorProduct("Product Title", "Brand Name", "Product Expiry"));
-        productList.add(new VendorProduct("Product Title", "Brand Name", "Product Expiry"));
-        productAdapter.notifyDataSetChanged();
-    }
+        String token = session.getToken();
+        if (token == null) {
+            goToLogin();
+            return;
+        }
 
-    private void setupClickListeners() {
-        btnAddProduct.setOnClickListener(v -> {
-            startActivity(new Intent(this, VendorAddProductActivity.class));
-        });
+        apiService.getVendorProducts("Bearer " + token)
+                .enqueue(new Callback<VendorProductListResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<VendorProductListResponse> call,
+                                           @NonNull Response<VendorProductListResponse> response) {
+
+                        if (response.isSuccessful() && response.body() != null && response.body().status) {
+                            productList.clear();
+
+                            for (VendorProductListResponse.VendorProduct product : response.body().products) {
+                                VendorProduct vendorProduct = new VendorProduct(
+                                        product.product_name,
+                                        product.brand_name != null ? "Brand: "+product.brand_name : "N/A",
+                                        product.product_expiry_formatted != null ? "Expiry Date: "+product.product_expiry_formatted : "N/A"
+                                );
+                                vendorProduct.setId(product.id);
+                                vendorProduct.setProductRate(product.product_rate);
+                                vendorProduct.setQuantity(product.quantity);
+                                vendorProduct.setImages(product.images);
+
+                                productList.add(vendorProduct);
+                            }
+
+                            productAdapter.notifyDataSetChanged();
+                        } else {
+                            Toast.makeText(VendorProductListActivity.this,
+                                    "Failed to load products",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<VendorProductListResponse> call,
+                                          @NonNull Throwable t) {
+                        Toast.makeText(VendorProductListActivity.this,
+                                "Network error: " + t.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void showProductMenu(View view, int position) {
@@ -125,62 +171,77 @@ public class VendorProductListActivity extends AppCompatActivity {
         popupMenu.inflate(R.menu.product_menu);
 
         popupMenu.setOnMenuItemClickListener(item -> {
-            int id = item.getItemId();
+            VendorProduct product = productList.get(position);
 
-            if (id == R.id.menu_edit) {
-                editProduct(position);
+            if (item.getItemId() == R.id.menu_edit) {
+                Intent intent = new Intent(this, VendorAddProductActivity.class);
+                intent.putExtra("PRODUCT_ID", product.getId());
+                intent.putExtra("EDIT_MODE", true);
+                startActivity(intent);
                 return true;
-            } else if (id == R.id.menu_delete) {
-                deleteProduct(position);
-                return true;
-            } else if (id == R.id.menu_share) {
-                shareProduct(position);
+            } else if (item.getItemId() == R.id.menu_delete) {
+                deleteProduct(product.getId(), position);
                 return true;
             }
-
             return false;
         });
 
         popupMenu.show();
     }
 
-    private void editProduct(int position) {
-        Toast.makeText(this, "Edit product at position " + position, Toast.LENGTH_SHORT).show();
-        // TODO: Navigate to edit product activity
-        // Intent intent = new Intent(this, EditProductActivity.class);
-        // intent.putExtra("product_id", productList.get(position).getId());
-        // startActivity(intent);
-    }
+    /**
+     * ❌ Delete product
+     */
+    private void deleteProduct(int productId, int position) {
+        String token = session.getToken();
+        if (token == null) {
+            goToLogin();
+            return;
+        }
 
-    private void deleteProduct(int position) {
-        // TODO: Show confirmation dialog before deleting
-        productList.remove(position);
-        productAdapter.notifyItemRemoved(position);
-        productAdapter.notifyItemRangeChanged(position, productList.size());
-        Toast.makeText(this, "Product deleted", Toast.LENGTH_SHORT).show();
-    }
+        apiService.deleteVendorProduct("Bearer " + token, productId)
+                .enqueue(new Callback<VendorProductResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<VendorProductResponse> call,
+                                           @NonNull Response<VendorProductResponse> response) {
+                        if (response.isSuccessful()) {
+                            productList.remove(position);
+                            productAdapter.notifyItemRemoved(position);
+                            Toast.makeText(VendorProductListActivity.this,
+                                    "Product deleted",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(VendorProductListActivity.this,
+                                    "Delete failed",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-    private void shareProduct(int position) {
-        VendorProduct product = productList.get(position);
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                "Check out this product: " + product.getTitle() +
-                        "\nBrand: " + product.getBrandName());
-        startActivity(Intent.createChooser(shareIntent, "Share product via"));
+                    @Override
+                    public void onFailure(@NonNull Call<VendorProductResponse> call,
+                                          @NonNull Throwable t) {
+                        Toast.makeText(VendorProductListActivity.this,
+                                "Error: " + t.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void logout() {
-        Toast.makeText(this, "Logging out...", Toast.LENGTH_SHORT).show();
+        session.clear();
+        goToLogin();
+    }
+
+    private void goToLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
         finish();
     }
 
     @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(navigationView)) {
-            drawerLayout.closeDrawers();
-        } else {
-            super.onBackPressed();
-        }
+    protected void onResume() {
+        super.onResume();
+        loadProducts(); // Refresh when returning from add/edit
     }
 }

@@ -9,9 +9,11 @@
 
     <!-- MAIN CONTENT -->
     <LinearLayout
+        android:id="@+id/mainLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:fitsSystemWindows="true">
 
         <!-- TOOLBAR -->
         <androidx.appcompat.widget.Toolbar
@@ -34,95 +36,103 @@
                 android:src="@android:drawable/ic_menu_myplaces"/>
         </androidx.appcompat.widget.Toolbar>
 
-        <ScrollView
+        <!-- SWIPE REFRESH LAYOUT -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:layout_height="match_parent">
 
-            <LinearLayout
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:fillViewport="true">
 
-                <!-- SUMMARY CARDS -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:weightSum="3">
+                    android:orientation="vertical">
 
-                    <include layout="@layout/card_summary"
-                        android:id="@+id/cardTotalProduct"
-                        android:layout_width="0dp"
+                    <!-- SUMMARY CARDS -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"/>
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:weightSum="3">
 
-                    <include layout="@layout/card_summary"
-                        android:id="@+id/cardActiveProduct"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="4dp"/>
+                        <include layout="@layout/card_summary"
+                            android:id="@+id/cardTotalProduct"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"/>
 
-                    <include layout="@layout/card_summary"
-                        android:id="@+id/cardNearExpiry"
-                        android:layout_width="0dp"
+                        <include layout="@layout/card_summary"
+                            android:id="@+id/cardActiveProduct"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="4dp"
+                            android:layout_marginEnd="4dp"/>
+
+                        <include layout="@layout/card_summary"
+                            android:id="@+id/cardNearExpiry"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+
+                    <!-- RECENT PRODUCTS HEADER -->
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"/>
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="Recent Products"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:textStyle="bold"/>
+
+                    <!-- PRODUCT LIST -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/productRecycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="8dp"
+                        android:nestedScrollingEnabled="false"/>
+
+                    <!-- ADD PRODUCT BUTTON -->
+                    <Button
+                        android:id="@+id/btnAddProduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_margin="16dp"
+                        android:background="@drawable/green_button"
+                        android:text="Add Product"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"/>
+
+                    <!-- PRODUCT LIST BUTTON -->
+                    <Button
+                        android:id="@+id/btnProductList"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/green_button"
+                        android:text="Product List"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"/>
                 </LinearLayout>
-
-                <!-- RECENT PRODUCTS HEADER -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="Recent Product"
-                    android:textColor="#000000"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
-
-                <!-- PRODUCT LIST -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/productRecycler"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:paddingBottom="8dp"/>
-
-                <!-- ADD PRODUCT BUTTON -->
-                <Button
-                    android:id="@+id/btnAddProduct"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_margin="16dp"
-                    android:background="@drawable/green_button"
-                    android:text="Add Product"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
-
-                <!-- PRODUCT LIST BUTTON -->
-                <Button
-                    android:id="@+id/btnProductList"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="@drawable/green_button"
-                    android:text="Product List"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-        </ScrollView>
+            </ScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </LinearLayout>
 
     <!-- NAV DRAWER -->

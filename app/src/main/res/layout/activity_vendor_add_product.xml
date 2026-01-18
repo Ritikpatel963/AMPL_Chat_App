@@ -8,7 +8,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:id="@+id/mainLinearLayout">
 
         <!-- Toolbar -->
         <androidx.appcompat.widget.Toolbar
@@ -121,7 +122,7 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Product Name with Dropdown -->
+                <!-- Product Name -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -133,12 +134,12 @@
                     app:boxCornerRadiusBottomEnd="8dp"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                    <AutoCompleteTextView
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/productNameInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Product Name"
-                        android:inputType="none"
+                        android:inputType="textCapWords"
                         android:padding="16dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -182,7 +183,8 @@
                         android:id="@+id/brandNameInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Brand Name"
+                        android:hint="Brand Name (Optional)"
+                        android:inputType="textCapWords"
                         android:padding="16dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -206,6 +208,29 @@
                         android:layout_height="wrap_content"
                         android:hint="Product Weight (Liter/Kilogram)"
                         android:inputType="none"
+                        android:padding="16dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Product Rate -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:boxStrokeColor="@color/colorPrimary"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusBottomEnd="8dp"
+                    app:prefixText="₹ "
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/productRateInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Product Rate"
+                        android:inputType="numberDecimal"
                         android:padding="16dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -248,8 +273,8 @@
                         android:id="@+id/productExpiryInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Product Expiry"
-                        android:inputType="date"
+                        android:hint="Product Expiry (Optional)"
+                        android:inputType="none"
                         android:padding="16dp"
                         android:focusable="false"
                         android:clickable="true" />
@@ -279,6 +304,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        app:headerLayout="@layout/vendor_nav_header"
         app:menu="@menu/drawer_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
