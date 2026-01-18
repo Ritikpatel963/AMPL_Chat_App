@@ -1,4 +1,32 @@
 <resources>
     <string name="app_name">AMPL CHAT</string>
     <string name="license_type">License Type</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- Menu Items -->
+    <string name="menu_dashboard">Dashboard</string>
+    <string name="menu_products">Products</string>
+    <string name="menu_logout">Logout</string>
+
+    <!-- Product Menu -->
+    <string name="menu_edit">Edit</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_share">Share</string>
+
+    <!-- Add Product -->
+    <string name="upload_product">Upload Product</string>
+    <string name="download_csv">Download csv</string>
+    <string name="product_image">Product Image</string>
+    <string name="product_name">Product Name</string>
+    <string name="product_category">Product Category</string>
+    <string name="brand_name">Brand Name</string>
+    <string name="product_weight">Product Weight (Liter/Kilogram)</string>
+    <string name="product_qty">Product Qty</string>
+    <string name="product_expiry">Product Expiery</string>
+    <string name="add_product">Add Product</string>
+
+    <!-- Product List -->
+    <string name="all_products">All Product</string>
 </resources>
