@@ -2,9 +2,10 @@
 <androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/drawerLayout"
+    android:id="@+id/mainContent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <!-- MAIN CONTENT -->
     <LinearLayout
@@ -17,37 +18,111 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@color/colorPrimaryVariant"
-            app:title="Dashboard"
-            app:titleTextColor="@android:color/white">
+            android:background="@color/colorPrimary"
+            android:elevation="4dp"
+            app:titleTextColor="@android:color/white"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
             <ImageView
                 android:id="@+id/profileIcon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="end"
-                android:src="@drawable/ic_profile"/>
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/circle_white"
+                android:padding="8dp"
+                android:src="@android:drawable/ic_menu_myplaces"/>
         </androidx.appcompat.widget.Toolbar>
 
-        <!-- SUMMARY CARDS -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="12dp"
-            android:weightSum="3">
-
-            <include layout="@layout/card_summary"/>
-            <include layout="@layout/card_summary"/>
-            <include layout="@layout/card_summary"/>
-        </LinearLayout>
-
-        <!-- PRODUCT LIST -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/productRecycler"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp"/>
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- SUMMARY CARDS -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:weightSum="3">
+
+                    <include layout="@layout/card_summary"
+                        android:id="@+id/cardTotalProduct"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"/>
+
+                    <include layout="@layout/card_summary"
+                        android:id="@+id/cardActiveProduct"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"/>
+
+                    <include layout="@layout/card_summary"
+                        android:id="@+id/cardNearExpiry"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"/>
+                </LinearLayout>
+
+                <!-- RECENT PRODUCTS HEADER -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Recent Product"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <!-- PRODUCT LIST -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/productRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="8dp"/>
+
+                <!-- ADD PRODUCT BUTTON -->
+                <Button
+                    android:id="@+id/btnAddProduct"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_margin="16dp"
+                    android:background="@drawable/green_button"
+                    android:text="Add Product"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <!-- PRODUCT LIST BUTTON -->
+                <Button
+                    android:id="@+id/btnProductList"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/green_button"
+                    android:text="Product List"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 
     <!-- NAV DRAWER -->
@@ -56,6 +131,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        app:headerLayout="@layout/vendor_nav_header"
         app:menu="@menu/drawer_menu"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

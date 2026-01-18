@@ -3,6 +3,7 @@ package com.agromarket.ampl_chat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -37,7 +38,11 @@ public class LoginActivity extends AppCompatActivity {
 
         // 🔥 Auto-login check
         if (!TextUtils.isEmpty(sessionManager.getToken())) {
-            openMain();
+            if("vendor".equals(sessionManager.getUserRole())){
+                openVendorDashboard();
+            }else{
+                openAgentDashboard();
+            }
             return;
         }
 
@@ -119,13 +124,15 @@ public class LoginActivity extends AppCompatActivity {
         sessionManager.saveUserRole(role);
 
         if ("customer".equalsIgnoreCase(role)) {
-            openChat(userId, agentId, name);
-        } else {
-            openMain();
+            openCustomerChat(userId, agentId, name);
+        } else if("agent".equalsIgnoreCase(role)) {
+            openAgentDashboard();
+        }else{
+            openVendorDashboard();
         }
     }
 
-    private void openChat(int customerId, int agentId, String name) {
+    private void openCustomerChat(int customerId, int agentId, String name) {
         Intent intent = new Intent(this, ChatScreenActivity.class);
         intent.putExtra("customer_id", customerId);
         intent.putExtra("agent_id", agentId);
@@ -134,8 +141,13 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    private void openMain() {
+    private void openAgentDashboard() {
         startActivity(new Intent(this, MainActivity.class));
+        finish();
+    }
+
+    private void openVendorDashboard() {
+        startActivity(new Intent(this, VendorActivity.class));
         finish();
     }
 

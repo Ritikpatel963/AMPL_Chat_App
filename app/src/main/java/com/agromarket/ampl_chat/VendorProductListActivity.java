@@ -2,14 +2,11 @@ package com.agromarket.ampl_chat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -27,21 +24,20 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VendorActivity extends AppCompatActivity {
+public class VendorProductListActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private Toolbar toolbar;
-    private Button btnAddProduct, btnProductList;
     private RecyclerView productRecycler;
     private VendorProductAdapter productAdapter;
     private List<VendorProduct> productList;
+    private Button btnAddProduct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_vendor);
+        setContentView(R.layout.activity_vendor_product_list);
 
         initViews();
         setupWindowInsets();
@@ -49,32 +45,21 @@ public class VendorActivity extends AppCompatActivity {
         setupNavigationDrawer();
         setupRecyclerView();
         loadProducts();
-
-        btnAddProduct.setOnClickListener(v-> {
-            startActivity(new Intent(this, VendorAddProductActivity.class));
-        });
-
-        btnProductList.setOnClickListener(v-> {
-            startActivity(new Intent(this, VendorProductListActivity.class));
-        });
+        setupClickListeners();
     }
 
     private void initViews() {
-        drawerLayout = findViewById(R.id.mainContent);
+        drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
         toolbar = findViewById(R.id.toolbar);
         productRecycler = findViewById(R.id.productRecycler);
-
         btnAddProduct = findViewById(R.id.btnAddProduct);
-        btnProductList = findViewById(R.id.btnProductList);
     }
 
     private void setupWindowInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainContent), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.drawerLayout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            // Apply top padding to toolbar to push it below status bar
             toolbar.setPadding(0, systemBars.top, 0, 0);
-            // Don't consume the insets so navigation drawer can also use them
             return insets;
         });
     }
@@ -83,7 +68,7 @@ public class VendorActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Dashboard");
+            getSupportActionBar().setTitle("");
         }
     }
 
@@ -100,10 +85,9 @@ public class VendorActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.nav_dashboard) {
-                Toast.makeText(this, "Dashboard", Toast.LENGTH_SHORT).show();
+                finish();
             } else if (id == R.id.nav_products) {
-                // Navigate to Product List Activity
-                startActivity(new Intent(this, VendorProductListActivity.class));
+                Toast.makeText(this, "Already on Products page", Toast.LENGTH_SHORT).show();
             } else if (id == R.id.nav_logout) {
                 logout();
             }
@@ -125,7 +109,15 @@ public class VendorActivity extends AppCompatActivity {
         productList.add(new VendorProduct("Product Title", "Brand Name", "Product Expiry"));
         productList.add(new VendorProduct("Product Title", "Brand Name", "Product Expiry"));
         productList.add(new VendorProduct("Product Title", "Brand Name", "Product Expiry"));
+        productList.add(new VendorProduct("Product Title", "Brand Name", "Product Expiry"));
+        productList.add(new VendorProduct("Product Title", "Brand Name", "Product Expiry"));
         productAdapter.notifyDataSetChanged();
+    }
+
+    private void setupClickListeners() {
+        btnAddProduct.setOnClickListener(v -> {
+            startActivity(new Intent(this, VendorAddProductActivity.class));
+        });
     }
 
     private void showProductMenu(View view, int position) {
@@ -136,15 +128,13 @@ public class VendorActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.menu_edit) {
-                Toast.makeText(this, "Edit product at position " + position, Toast.LENGTH_SHORT).show();
+                editProduct(position);
                 return true;
             } else if (id == R.id.menu_delete) {
-                Toast.makeText(this, "Delete product at position " + position, Toast.LENGTH_SHORT).show();
-                productList.remove(position);
-                productAdapter.notifyItemRemoved(position);
+                deleteProduct(position);
                 return true;
             } else if (id == R.id.menu_share) {
-                Toast.makeText(this, "Share product at position " + position, Toast.LENGTH_SHORT).show();
+                shareProduct(position);
                 return true;
             }
 
@@ -154,8 +144,33 @@ public class VendorActivity extends AppCompatActivity {
         popupMenu.show();
     }
 
+    private void editProduct(int position) {
+        Toast.makeText(this, "Edit product at position " + position, Toast.LENGTH_SHORT).show();
+        // TODO: Navigate to edit product activity
+        // Intent intent = new Intent(this, EditProductActivity.class);
+        // intent.putExtra("product_id", productList.get(position).getId());
+        // startActivity(intent);
+    }
+
+    private void deleteProduct(int position) {
+        // TODO: Show confirmation dialog before deleting
+        productList.remove(position);
+        productAdapter.notifyItemRemoved(position);
+        productAdapter.notifyItemRangeChanged(position, productList.size());
+        Toast.makeText(this, "Product deleted", Toast.LENGTH_SHORT).show();
+    }
+
+    private void shareProduct(int position) {
+        VendorProduct product = productList.get(position);
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT,
+                "Check out this product: " + product.getTitle() +
+                        "\nBrand: " + product.getBrandName());
+        startActivity(Intent.createChooser(shareIntent, "Share product via"));
+    }
+
     private void logout() {
-        // Implement logout logic
         Toast.makeText(this, "Logging out...", Toast.LENGTH_SHORT).show();
         finish();
     }

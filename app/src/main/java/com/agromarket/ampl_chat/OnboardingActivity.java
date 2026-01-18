@@ -49,9 +49,12 @@ public class OnboardingActivity extends AppCompatActivity {
     private void handleLoggedInUser() {
         String role = sessionManager.getUserRole();
 
+
         if ("customer".equalsIgnoreCase(role)) {
             fetchAssignedAgent();
-        } else {
+        } else if("vendor".equalsIgnoreCase(role)){
+            openVendorActivity();
+        }else {
             openMainActivity();
         }
     }
@@ -102,6 +105,11 @@ public class OnboardingActivity extends AppCompatActivity {
 
     private void openMainActivity() {
         startActivity(new Intent(this, MainActivity.class));
+        finish();
+    }
+
+    private void openVendorActivity() {
+        startActivity(new Intent(this, VendorActivity.class));
         finish();
     }
 }

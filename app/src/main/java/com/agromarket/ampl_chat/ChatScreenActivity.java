@@ -77,6 +77,7 @@ public class ChatScreenActivity extends AppCompatActivity
     private final ArrayList<MessageItem> messageList = new ArrayList<>();
 
     private EditText messageBox;
+    private TextView chatTitle;
     private ImageView sendBtn, cartBtn, backBtn, callBtn;
 
     /* ================= PRODUCTS ================= */
@@ -106,7 +107,14 @@ public class ChatScreenActivity extends AppCompatActivity
         int agentId = getIntent().getIntExtra("agent_id", 0);
         receiverId = isCustomer ? agentId : customerId;
 
+        boolean isCustomer = session.getUserRole() != null && session.getUserRole().equals("customer");
+
         initViews();
+
+        String chatName = getIntent().getStringExtra("name");
+        if (isCustomer) chatTitle.setVisibility(View.GONE);
+        else chatTitle.setText(chatName);
+
         setupChat();
         loadMessages();
         markMessagesSeen();
@@ -129,6 +137,7 @@ public class ChatScreenActivity extends AppCompatActivity
         cartBtn = findViewById(R.id.cartBtn);
         callBtn = findViewById(R.id.callBtn);
         backBtn = findViewById(R.id.backBtn);
+        chatTitle = findViewById(R.id.chatName);
 
         chatRecycler.setLayoutManager(new LinearLayoutManager(this));
 
